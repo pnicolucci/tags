@@ -126,6 +126,14 @@
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
+                <!-- We need to exclude the tld files that are only used for tlddoc generation. The generated
+                     tlddoc from these files is later modified to add the correct URIs. The actual tlds
+                     are included in the resulting JAR and have all the necessary Jakarta updates that won't
+                     work with tlddoc.
+                -->
+                <excludes>
+                    <exclude>**/*tlddoc-only.tld</exclude>
+                </excludes>
             </resource>
             <resource>
                 <directory>${project.basedir}/..</directory>
@@ -342,8 +350,12 @@
                         </goals>
                         <configuration>
                             <target>
-                                <echo level="info">Replacing in ${project.build.directory}/tlddoc</echo>
+                                <echo level="info">Replacing javax.el.ValueExpression with jakarta.el.ValueExpression in ${project.build.directory}/tlddoc</echo>
                                 <replace token="javax.el.ValueExpression" value="jakarta.el.ValueExpression" dir="${project.build.directory}/tlddoc" summary="yes">
+                                    <include name="**/*.html"/>
+                                </replace>
+                                <echo level="info">Replacing old x.tld uri with new Jakarta URIs</echo>
+                                <replace token="http://java.sun.com/jsp/jstl/xml" value="jakarta.tags.xml" dir="${project.build.directory}/tlddoc/x" summary="yes">
                                     <include name="**/*.html"/>
                                 </replace>
                             </target>
@@ -435,11 +447,12 @@ Copyright &#169; 2019,2020 Eclipse Foundation. All rights reserved.
                                 <argument>Jakarta Tags Doc</argument>
                                 <argument>-d</argument>
                                 <argument>${project.build.directory}/tlddoc</argument>
-                                <argument>${project.basedir}/src/main/resources/META-INF/sql.tld</argument>
+                                <!-- <argument>${project.basedir}/src/main/resources/META-INF/sql.tld</argument>
                                 <argument>${project.basedir}/src/main/resources/META-INF/x.tld</argument>
                                 <argument>${project.basedir}/src/main/resources/META-INF/fmt.tld</argument>
                                 <argument>${project.basedir}/src/main/resources/META-INF/c.tld</argument>
-                                <argument>${project.basedir}/src/main/resources/META-INF/fn.tld</argument>
+                                <argument>${project.basedir}/src/main/resources/META-INF/fn.tld</argument> -->
+                                <argument>${project.basedir}/src/main/resources/META-INF/x-tlddoc-only.tld</argument>
                             </arguments>
                         </configuration>
                     </execution>
